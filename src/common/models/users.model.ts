@@ -1,4 +1,4 @@
-import { Table, Column, Model } from 'sequelize-typescript';
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
   tableName: 'users',
@@ -7,8 +7,8 @@ export class User extends Model {
   @Column
   name: string;
 
-  @Column({ unique: true })
-  phone_number: bigint;
+  @Column({ type: DataType.STRING(20), unique: true })
+  phone_number: string;
 
   @Column({ unique: true })
   username: string;

@@ -12,6 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/common/models/users.model';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -46,11 +47,18 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<ResponseDto<User>> {
     try {
-      const existingUser = await this.userModel.findOne({
+      const existingEmail = await this.userModel.findOne({
         where: { email: createUserDto.email },
       });
-      if (existingUser) {
+      if (existingEmail) {
         throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+      }
+
+      const existingUsername = await this.userModel.findOne({
+        where: { username: createUserDto.username },
+      });
+      if (existingUsername) {
+        throw new HttpException('Username already exists', HttpStatus.CONFLICT);
       }
 
       const existingPhone = await this.userModel.findOne({
@@ -63,7 +71,12 @@ export class UsersService {
         );
       }
 
-      const user = await this.userModel.create({ ...createUserDto });
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+      const user = await this.userModel.create({
+        ...createUserDto,
+        password: hashedPassword,
+      });
 
       return new ResponseDto<User>({ data: user });
     } catch (error) {
@@ -86,7 +99,6 @@ export class UsersService {
 
     await this.userModel.update(updateUserDto, { where: { id } });
 
-    // Ambil user terbaru setelah update
     const updatedUser = await this.userModel.findByPk(id);
     if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found after update`);
