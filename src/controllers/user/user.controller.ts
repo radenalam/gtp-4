@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,13 +19,16 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get all users' })
   @Get()
-  getAll() {
-    return this.usersService.getAll();
+  async getUsers(
+    @Query('page') page: number = 1,
+    @Query('size') size: number = 10,
+  ) {
+    return this.usersService.getAll(+page, +size);
   }
 
   @ApiOperation({ summary: 'Get user By Id' })
   @Get(':id')
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param('id') id: number) {
     return this.usersService.findOne(+id);
   }
 
@@ -36,13 +40,13 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Edit user' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @ApiOperation({ summary: 'Delete user' })
-  @Delete(':uuid')
-  delete(@Param('uuid') uuid: string) {
-    return this.usersService.delete(uuid);
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.usersService.delete(+id);
   }
 }
