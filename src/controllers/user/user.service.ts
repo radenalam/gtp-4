@@ -95,7 +95,7 @@ export class UsersService {
     return new ResponseDto<User>({ data: updatedUser });
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     const user = await this.userModel.findByPk(id);
 
     if (!user) {

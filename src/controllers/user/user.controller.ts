@@ -12,8 +12,6 @@ import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation } from '@nestjs/swagger';
-import { ResponseDto } from 'src/common/dto/response.dto';
-import { User } from 'src/common/models/users.model';
 
 @Controller('user')
 export class UsersController {
@@ -30,7 +28,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get user By Id' })
   @Get(':id')
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param('id') id: number) {
     return this.usersService.findOne(+id);
   }
 
@@ -42,13 +40,13 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Edit user' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @ApiOperation({ summary: 'Delete user' })
-  @Delete(':uuid')
-  delete(@Param('uuid') uuid: string) {
-    return this.usersService.delete(uuid);
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.usersService.delete(+id);
   }
 }
