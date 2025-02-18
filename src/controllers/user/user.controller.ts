@@ -6,11 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { ResponseDto } from 'src/common/dto/response.dto';
+import { User } from 'src/common/models/users.model';
 
 @Controller('user')
 export class UsersController {
@@ -18,8 +21,11 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get all users' })
   @Get()
-  getAll() {
-    return this.usersService.getAll();
+  async getUsers(
+    @Query('page') page: number = 1,
+    @Query('size') size: number = 10,
+  ) {
+    return this.usersService.getAll(+page, +size);
   }
 
   @ApiOperation({ summary: 'Get user By Id' })

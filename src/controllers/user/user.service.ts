@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/common/models/users.model';
 import { ResponseDto } from 'src/common/dto/response.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +19,21 @@ export class UsersService {
     @Inject('USER_REPOSITORY') private readonly userModel: typeof User,
   ) {}
 
-  async getAll(): Promise<ResponseDto<User[]>> {
-    const users = await this.userModel.findAll();
-    return new ResponseDto<User[]>({ data: users });
+  async getAll(
+    page: number = 1,
+    size: number = 10,
+  ): Promise<ResponseDto<User[]>> {
+    const offset = (page - 1) * size;
+    const { rows: users, count } = await this.userModel.findAndCountAll({
+      limit: size,
+      offset: offset,
+    });
+    const meta = new PaginationDto({
+      page,
+      size,
+      totalItems: count,
+    });
+    return new ResponseDto<User[]>({ data: users, pagination: meta });
   }
 
   async findOne(id: number): Promise<ResponseDto<User>> {
