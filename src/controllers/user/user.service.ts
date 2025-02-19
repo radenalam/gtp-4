@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Res,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/common/models/users.model';
@@ -50,7 +51,13 @@ export class UsersService {
         );
       }
 
-      const user = await this.userModel.create({ ...createUserDto });
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+
+      const user = await this.userModel.create({
+        ...createUserDto,
+        password: hashedPassword,
+      });
 
       return new ResponseDto<User>({ data: user });
     } catch (error) {
@@ -73,7 +80,6 @@ export class UsersService {
 
     await this.userModel.update(updateUserDto, { where: { id } });
 
-    // Ambil user terbaru setelah update
     const updatedUser = await this.userModel.findByPk(id);
     if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found after update`);
@@ -92,5 +98,13 @@ export class UsersService {
     await this.userModel.destroy({ where: { id } });
 
     return HttpStatus.NO_CONTENT;
+  }
+
+  async findByEmail(email: string) {
+    const user = this.userModel.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }
