@@ -7,12 +7,12 @@ import {
   NotFoundException,
   Res,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/common/models/users.model';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -117,5 +117,13 @@ export class UsersService {
     await this.userModel.destroy({ where: { id } });
 
     return HttpStatus.NO_CONTENT;
+  }
+
+  async findByEmail(email: string) {
+    const user = this.userModel.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }
