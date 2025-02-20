@@ -1,4 +1,70 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ResponseDto } from 'src/common/dto/response.dto';
+import { Project } from 'src/common/models/project.model';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
-export class ProjectService {}
+export class ProjectService {
+  constructor(
+    @Inject('PROJECT_REPOSITORY') private readonly projectModel: typeof Project,
+  ) {}
+
+  async getAll(
+    page: number = 1,
+    size: number = 10,
+  ): Promise<ResponseDto<Project[]>> {
+    const offset = (page - 1) * size;
+    const { rows: projects, count } = await this.projectModel.findAndCountAll({
+      limit: size,
+      offset: offset,
+    });
+    const meta = new PaginationDto({
+      page,
+      size,
+      totalItems: count,
+    });
+    return new ResponseDto<Project[]>({ data: projects, pagination: meta });
+  }
+
+  async findOne(id: number): Promise<ResponseDto<Project>> {
+    const project = await this.projectModel.findByPk(id);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    return new ResponseDto<Project>({ data: project });
+  }
+
+  async create(
+    createProjectDto: CreateProjectDto,
+  ): Promise<ResponseDto<Project>> {
+    const project = await this.projectModel.create({ ...createProjectDto });
+    return new ResponseDto<Project>({ data: project });
+  }
+
+  async update(
+    id: number,
+    updateProjectDto: UpdateProjectDto,
+  ): Promise<ResponseDto<Project>> {
+    const project = await this.projectModel.findByPk(id);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    await this.projectModel.update(updateProjectDto, { where: { id } });
+
+    const updatedProject = await this.projectModel.findByPk(id);
+    if (!updatedProject) {
+      throw new NotFoundException('Project not found');
+    }
+    return new ResponseDto<Project>({ data: updatedProject });
+  }
+
+  async delete(id: number) {
+    const project = await this.projectModel.findByPk(id);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    await this.projectModel.destroy({ where: { id } });
+  }
+}
