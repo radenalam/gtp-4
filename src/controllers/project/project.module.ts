@@ -1,10 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ProjectController } from './project.controller';
 import { ProjectService } from './project.service';
-import { projectProvider } from 'src/common/providers/model.provider';
+import {
+  projectMembersProvider,
+  projectProvider,
+} from 'src/common/providers/model.provider';
+import { ProjectMembersService } from './project-members.service';
 
 @Module({
   controllers: [ProjectController],
-  providers: [ProjectService, projectProvider],
+  providers: [
+    ProjectService,
+    ProjectMembersService,
+    projectProvider,
+    projectMembersProvider,
+  ],
 })
 export class ProjectModule {}
