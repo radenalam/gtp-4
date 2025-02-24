@@ -17,6 +17,26 @@ export class ProjectMembersService {
     private readonly projectMembersModel: typeof ProjectMembers,
   ) {}
 
+  async createProjectOwner(
+    user_id: number,
+    project_id: number,
+  ): Promise<ProjectMembers> {
+    return this.projectMembersModel.create({
+      user_id: user_id,
+      project_id: project_id,
+      role: 'owner',
+    });
+  }
+
+  async getUserProjectIds(user_id: number): Promise<number[]> {
+    const projectMembers = await this.projectMembersModel.findAll({
+      where: { user_id },
+      attributes: ['project_id'],
+    });
+
+    return projectMembers.map((pm) => pm.project_id);
+  }
+
   async getProjectMembers(
     project_id: number,
     page: number = 1,
@@ -54,10 +74,13 @@ export class ProjectMembersService {
   }
 
   async addMemberToProject(
+    loggedInUserId: number,
     user_id: number,
     project_id: number,
     role: string,
   ): Promise<ProjectMembers> {
+    await this.checkUserIsOwner(loggedInUserId, project_id);
+
     const existingMember = await this.projectMembersModel.findOne({
       where: { user_id, project_id },
     });
@@ -65,6 +88,7 @@ export class ProjectMembersService {
     if (existingMember) {
       throw new ForbiddenException('User is already a member of this project');
     }
+
     return this.projectMembersModel.create({
       user_id,
       project_id,
@@ -77,12 +101,10 @@ export class ProjectMembersService {
     project_id: number,
     user_id: number,
   ): Promise<void> {
-    const owner = await this.projectMembersModel.findOne({
-      where: { user_id: loggedInUserId, project_id, role: 'owner' },
-    });
-
-    if (!owner) {
-      throw new ForbiddenException('Only the project owner can remove members');
+    if (loggedInUserId === user_id) {
+      throw new ForbiddenException(
+        'You cannot remove yourself from the project',
+      );
     }
 
     const member = await this.projectMembersModel.findOne({
@@ -94,5 +116,21 @@ export class ProjectMembersService {
     }
 
     await this.projectMembersModel.destroy({ where: { user_id, project_id } });
+  }
+
+  async checkUserIsOwner(
+    user_id: number,
+    project_id: number,
+  ): Promise<boolean> {
+    const projectMember = await this.projectMembersModel.findOne({
+      where: { user_id, project_id, role: 'owner' },
+    });
+
+    if (!projectMember) {
+      throw new ForbiddenException(
+        'Access denied: You are not the owner of this project',
+      );
+    }
+    return true;
   }
 }

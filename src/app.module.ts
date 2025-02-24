@@ -6,9 +6,17 @@ import { MysqlModule } from './common/modules/mysql.module';
 import { AuthModule } from './controllers/auth/auth.module';
 import { ProjectModule } from './controllers/project/project.module';
 import { EventModule } from './controllers/event/event.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, MysqlModule, AuthModule, ProjectModule, EventModule],
+  imports: [
+    ConfigModule.forRoot(),
+    UsersModule,
+    MysqlModule,
+    AuthModule,
+    ProjectModule,
+    EventModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

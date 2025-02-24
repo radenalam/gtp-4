@@ -23,7 +23,7 @@ export class ProjectMembers extends Model {
   @Column
   role: string;
 
-  @BelongsTo(() => Project)
+  @BelongsTo(() => Project, { onDelete: 'CASCADE' })
   project: Project;
 
   @BelongsTo(() => User)
