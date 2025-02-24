@@ -4,19 +4,27 @@ import { ResponseDto } from 'src/common/dto/response.dto';
 import { Project } from 'src/common/models/project.model';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectMembersService } from './project-members.service';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @Inject('PROJECT_REPOSITORY') private readonly projectModel: typeof Project,
+    private readonly projectMembersService: ProjectMembersService,
   ) {}
 
   async getAll(
     page: number = 1,
     size: number = 10,
+    user_id: number,
   ): Promise<ResponseDto<Project[]>> {
     const offset = (page - 1) * size;
+
+    const projectIds =
+      await this.projectMembersService.getUserProjectIds(user_id);
+
     const { rows: projects, count } = await this.projectModel.findAndCountAll({
+      where: { id: projectIds },
       limit: size,
       offset: offset,
     });
@@ -37,9 +45,11 @@ export class ProjectService {
   }
 
   async create(
+    owner_id: number,
     createProjectDto: CreateProjectDto,
   ): Promise<ResponseDto<Project>> {
     const project = await this.projectModel.create({ ...createProjectDto });
+    await this.projectMembersService.createProjectOwner(owner_id, project.id);
     return new ResponseDto<Project>({ data: project });
   }
 
