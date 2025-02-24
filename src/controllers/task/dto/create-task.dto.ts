@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateEventDto {
+export class CreateTaskDto {
   @IsNotEmpty()
   project_id: number;
 

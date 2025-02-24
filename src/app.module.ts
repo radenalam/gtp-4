@@ -7,6 +7,7 @@ import { AuthModule } from './controllers/auth/auth.module';
 import { ProjectModule } from './controllers/project/project.module';
 import { EventModule } from './controllers/event/event.module';
 import { ConfigModule } from '@nestjs/config';
+import { TaskModule } from './controllers/task/task.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     ProjectModule,
     EventModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],
