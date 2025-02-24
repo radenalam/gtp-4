@@ -16,6 +16,7 @@ export class User extends Model {
   @Column({ unique: true })
   email: string;
 
+  //TODO
   @Column
   password: string;
 }

@@ -20,7 +20,7 @@ async function bootstrap() {
     .setTitle('GTP')
     .setDescription('GTP API Documentation')
     .setVersion('1.0')
-    .addTag('user')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   app.use(
