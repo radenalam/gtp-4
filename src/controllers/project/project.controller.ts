@@ -57,7 +57,7 @@ export class ProjectController {
     return this.projectService.update(+id, updateProjectDto);
   }
 
-  @UseGuards(ProjectMemberGuard)
+  @UseGuards(ProjectOwnerGuard)
   @ApiOperation({ summary: 'Delete project' })
   @Delete(':id')
   delete(@Param('id') id: number) {
@@ -75,7 +75,7 @@ export class ProjectController {
     return this.projectMembersService.getProjectMembers(project_id, page, size);
   }
 
-  @UseGuards(ProjectMemberGuard)
+  @UseGuards(ProjectOwnerGuard)
   @ApiOperation({ summary: 'Add member to project' })
   @Post(':id/members')
   async addMember(
