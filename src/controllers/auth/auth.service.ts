@@ -44,7 +44,6 @@ export class AuthService {
       }
 
       const user = await this.userModel.create({ ...registerDto });
-
       return new ResponseDto<User>({ data: user });
     } catch (error) {
       throw new HttpException(

@@ -16,7 +16,12 @@ export class User extends Model {
   @Column({ unique: true })
   email: string;
 
-  //TODO
   @Column
   password: string;
+
+  toJSON() {
+    const attributes = { ...this.get() };
+    delete attributes.password;
+    return attributes;
+  }
 }
