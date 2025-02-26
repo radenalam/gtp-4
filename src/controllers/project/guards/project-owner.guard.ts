@@ -13,7 +13,7 @@ export class ProjectOwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const project_id = request.params.id;
+    const project_id = request.params.project_id;
 
     if (!user || !project_id) {
       throw new ForbiddenException(

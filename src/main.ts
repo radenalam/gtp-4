@@ -1,20 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RequestMethod, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
-import { JwtAuthGuard } from './controllers/auth/jwt-auth.guard';
-import { ProjectMembersService } from './controllers/project/project-members.service';
-import { ProjectMemberGuard } from './controllers/project/guards/project-member.guard';
+import { AllExceptionsFilter } from './filters/all-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(new ValidationPipe());
-  const projectMembersService = app.get(ProjectMembersService);
-  // app.useGlobalGuards(
-  //   new JwtAuthGuard(),
-  //   new ProjectMemberGuard(projectMembersService),
-  // );
   app.setGlobalPrefix('api', {});
   const config = new DocumentBuilder()
     .setTitle('GTP')

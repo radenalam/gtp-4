@@ -9,12 +9,15 @@ import { addMemberToProjectDto } from './dto/add-member.dto';
 import { ProjectMembers } from 'src/common/models/project-members.model';
 import { ResponseDto } from 'src/common/dto/response.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Project } from 'src/common/models/project.model';
 
 @Injectable()
 export class ProjectMembersService {
   constructor(
     @Inject('PROJECT_MEMBERS_REPOSITORY')
     private readonly projectMembersModel: typeof ProjectMembers,
+    @Inject('PROJECT_REPOSITORY')
+    private readonly projectModel: typeof Project,
   ) {}
 
   async createProjectOwner(
@@ -74,12 +77,14 @@ export class ProjectMembersService {
   }
 
   async addMemberToProject(
-    loggedInUserId: number,
     user_id: number,
     project_id: number,
     role: string,
   ): Promise<ProjectMembers> {
-    await this.checkUserIsOwner(loggedInUserId, project_id);
+    const user = await this.projectModel.findByPk(user_id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     const existingMember = await this.projectMembersModel.findOne({
       where: { user_id, project_id },
