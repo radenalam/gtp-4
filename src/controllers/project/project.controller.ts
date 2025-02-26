@@ -39,9 +39,9 @@ export class ProjectController {
 
   @UseGuards(ProjectMemberGuard)
   @ApiOperation({ summary: 'Get project By Id' })
-  @Get(':id')
-  getProjectById(@Param('id') id: number) {
-    return this.projectService.findOne(+id);
+  @Get(':project_id')
+  getProjectById(@Param('project_id') project_id: number) {
+    return this.projectService.findOne(+project_id);
   }
 
   @ApiOperation({ summary: 'Create project' })
@@ -52,23 +52,26 @@ export class ProjectController {
 
   @UseGuards(ProjectMemberGuard)
   @ApiOperation({ summary: 'Edit project' })
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateProjectDto: CreateProjectDto) {
-    return this.projectService.update(+id, updateProjectDto);
+  @Patch(':project_id')
+  update(
+    @Param('project_id') project_id: number,
+    @Body() updateProjectDto: CreateProjectDto,
+  ) {
+    return this.projectService.update(+project_id, updateProjectDto);
   }
 
   @UseGuards(ProjectOwnerGuard)
   @ApiOperation({ summary: 'Delete project' })
-  @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.projectService.delete(+id);
+  @Delete(':project_id')
+  delete(@Param('project_id') project_id: number) {
+    return this.projectService.delete(+project_id);
   }
 
   @UseGuards(ProjectMemberGuard)
   @ApiOperation({ summary: 'Get project members' })
-  @Get(':id/members')
+  @Get(':project_id/members')
   async getMembers(
-    @Param('id') project_id: number,
+    @Param('project_id') project_id: number,
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
   ) {
@@ -77,16 +80,12 @@ export class ProjectController {
 
   @UseGuards(ProjectOwnerGuard)
   @ApiOperation({ summary: 'Add member to project' })
-  @Post(':id/members')
+  @Post(':project_id/members')
   async addMember(
-    @Param('id') project_id: number,
+    @Param('project_id') project_id: number,
     @Body() body: { user_id: number; role: string },
-    @Request() req,
   ) {
-    const loggedInUserId = req.user.id;
-
     return this.projectMembersService.addMemberToProject(
-      loggedInUserId,
       body.user_id,
       project_id,
       body.role,
@@ -95,9 +94,9 @@ export class ProjectController {
 
   @UseGuards(ProjectOwnerGuard)
   @ApiOperation({ summary: 'Remove member from project' })
-  @Delete(':id/members/:user_id')
+  @Delete(':project_id/members/:user_id')
   async removeMember(
-    @Param('id') project_id: number,
+    @Param('project_id') project_id: number,
     @Param('user_id') user_id: number,
     @Request() req,
   ) {

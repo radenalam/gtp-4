@@ -15,6 +15,6 @@ import { ProjectMembersService } from './project-members.service';
     projectProvider,
     projectMembersProvider,
   ],
-  exports: [ProjectService, projectProvider],
+  exports: [ProjectService, projectProvider, ProjectMembersService],
 })
 export class ProjectModule {}
