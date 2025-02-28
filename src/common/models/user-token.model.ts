@@ -13,7 +13,7 @@ import { User } from './users.model';
 export class UserToken extends Model {
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  user_id: number;
 
   @Column
   token: string;
