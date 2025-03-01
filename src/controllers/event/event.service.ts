@@ -12,6 +12,7 @@ import { ResponseDto } from 'src/common/dto/response.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Event } from 'src/common/models/event.model';
 import { ProjectService } from '../project/project.service';
+import { Project } from 'src/common/models/project.model';
 
 @Injectable()
 export class EventService {
@@ -57,6 +58,12 @@ export class EventService {
       where: { project_id },
       limit: size,
       offset: offset,
+      include: [
+        {
+          model: Project,
+          attributes: ['name'],
+        },
+      ],
     });
     const meta = new PaginationDto({
       page,
@@ -70,7 +77,14 @@ export class EventService {
     project_id: number,
     event_id: number,
   ): Promise<ResponseDto<Event>> {
-    const event = await this.eventModel.findByPk(event_id);
+    const event = await this.eventModel.findByPk(event_id, {
+      include: [
+        {
+          model: Project,
+          attributes: ['name'],
+        },
+      ],
+    });
     if (!event) {
       throw new NotFoundException('Event not found');
     }
