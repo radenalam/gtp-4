@@ -4,6 +4,7 @@ import { ProjectService } from './project.service';
 import {
   projectMembersProvider,
   projectProvider,
+  userProvider,
 } from 'src/common/providers/model.provider';
 import { ProjectMembersService } from './project-members.service';
 
@@ -14,6 +15,7 @@ import { ProjectMembersService } from './project-members.service';
     ProjectMembersService,
     projectProvider,
     projectMembersProvider,
+    userProvider,
   ],
   exports: [ProjectService, projectProvider, ProjectMembersService],
 })
