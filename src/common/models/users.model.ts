@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { UserToken } from './user-token.model';
 
 @Table({
   tableName: 'users',
@@ -18,6 +19,9 @@ export class User extends Model {
 
   @Column
   password: string;
+
+  @HasMany(() => UserToken, { onDelete: 'CASCADE' })
+  user_token: UserToken[];
 
   toJSON() {
     const attributes = { ...this.get() };

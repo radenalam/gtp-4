@@ -26,11 +26,18 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     try {
-      const existingUser = await this.userModel.findOne({
+      const existingEmail = await this.userModel.findOne({
         where: { email: registerDto.email },
       });
-      if (existingUser) {
+      if (existingEmail) {
         throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+      }
+
+      const existingUsername = await this.userModel.findOne({
+        where: { username: registerDto.username },
+      });
+      if (existingUsername) {
+        throw new HttpException('Username already exists', HttpStatus.CONFLICT);
       }
 
       const existingPhone = await this.userModel.findOne({
@@ -43,7 +50,13 @@ export class AuthService {
         );
       }
 
-      const user = await this.userModel.create({ ...registerDto });
+      const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
+      const user = await this.userModel.create({
+        ...registerDto,
+        password: hashedPassword,
+      });
+
       return new ResponseDto<User>({ data: user });
     } catch (error) {
       throw new HttpException(
