@@ -104,7 +104,7 @@ export class ProjectMembersService {
     project_id: number,
     user_id: number,
   ): Promise<void> {
-    if (loggedInUserId === user_id) {
+    if (Number(loggedInUserId) === Number(user_id)) {
       throw new ForbiddenException(
         'You cannot remove yourself from the project',
       );
