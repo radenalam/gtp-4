@@ -12,7 +12,7 @@ import {
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProjectMemberGuard } from '../project/guards/project-member.guard';
 
@@ -33,6 +33,8 @@ export class EventController {
 
   @UseGuards(ProjectMemberGuard)
   @ApiOperation({ summary: 'Get All event' })
+  @ApiQuery({ name: 'page', example: 1 })
+  @ApiQuery({ name: 'size', example: 10 })
   @Get('project/:project_id/event')
   findAll(
     @Param('project_id') project_id: number,

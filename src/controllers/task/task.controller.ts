@@ -13,7 +13,7 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
 @Controller()
@@ -30,6 +30,8 @@ export class TaskController {
   }
 
   @ApiOperation({ summary: 'Get all tasks' })
+  @ApiQuery({ name: 'page', example: 1 })
+  @ApiQuery({ name: 'size', example: 10 })
   @Get('project/:project_id/task')
   findAll(
     @Param('project_id') project_id: number,

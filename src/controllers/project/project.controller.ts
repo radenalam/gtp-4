@@ -11,13 +11,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectMembersService } from './project-members.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ProjectMemberGuard } from './guards/project-member.guard';
 import { Project } from 'src/common/models/project.model';
 import { ProjectOwnerGuard } from './guards/project-owner.guard';
+import { addMemberToProjectDto } from './dto/add-member.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('project')
@@ -28,6 +34,8 @@ export class ProjectController {
   ) {}
 
   @ApiOperation({ summary: 'Get all projects' })
+  @ApiQuery({ name: 'page', example: 1 })
+  @ApiQuery({ name: 'size', example: 10 })
   @Get()
   async getProjects(
     @Query('page') page: number = 1,
@@ -69,18 +77,33 @@ export class ProjectController {
 
   @UseGuards(ProjectMemberGuard)
   @ApiOperation({ summary: 'Get project members' })
+  @ApiQuery({ name: 'page', example: 1 })
+  @ApiQuery({ name: 'size', example: 10 })
   @Get(':project_id/members')
   async getMembers(
     @Param('project_id') project_id: number,
     @Query('page') page: number = 1,
     @Query('size') size: number = 10,
   ) {
-    return this.projectMembersService.getProjectMembers(project_id, page, size);
+    return this.projectMembersService.getProjectMembers(
+      project_id,
+      +page,
+      +size,
+    );
   }
 
   @UseGuards(ProjectOwnerGuard)
   @ApiOperation({ summary: 'Add member to project' })
   @Post(':project_id/members')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        user_id: { type: 'number', example: 1 },
+        role: { type: 'string', example: 'member' },
+      },
+    },
+  })
   async addMember(
     @Param('project_id') project_id: number,
     @Body() body: { user_id: number; role: string },

@@ -84,6 +84,6 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     await this.userTokenModel.create({ user_id: user.id, token });
 
-    return new ResponseDto({ data: { accesToken: token } });
+    return new ResponseDto({ data: { accessToken: token } });
   }
 }
